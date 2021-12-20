@@ -1,12 +1,5 @@
-﻿using DataPairs.Entities;
-using DataPairs.Interfaces;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using DataPairs.Interfaces;
 using Newtonsoft.Json;
-using System.Collections.Concurrent;
-using System.IO;
 using System.Text;
 
 namespace DataPairs

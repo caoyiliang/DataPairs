@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace DataPairs.Entities
+﻿namespace DataPairs.Entities
 {
     internal interface IVersion
     {

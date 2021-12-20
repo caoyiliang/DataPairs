@@ -1,11 +1,7 @@
 ﻿using DataPairs.Entities;
 using DataPairs.Interfaces;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using System.Collections.Concurrent;
 
 namespace DataPairs
 {
