@@ -1,33 +1,28 @@
 ﻿using DataPairs.Interfaces;
-using Newtonsoft.Json;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DataPairs
 {
     internal class PairsFile : IPairs
     {
         private readonly string _path;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
-        private Formatting _formatting = Formatting.Indented;
+        private readonly JsonSerializerOptions _jsonSerializerSettings;
         public PairsFile(bool includeTypeName = true) : this(AppDomain.CurrentDomain.BaseDirectory, includeTypeName)
         {
         }
-        public PairsFile(JsonSerializerSettings jsonSerializerSettings) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings, Formatting.Indented)
+        public PairsFile(JsonSerializerOptions jsonSerializerSettings) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings)
         {
 
         }
-        public PairsFile(JsonSerializerSettings jsonSerializerSettings, Formatting formatting) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings, formatting)
-        {
 
-        }
         public PairsFile(string path, bool includeTypeName = true)
         {
-            _jsonSerializerSettings = new JsonSerializerSettings
+            _jsonSerializerSettings = new()
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                TypeNameHandling = includeTypeName ? TypeNameHandling.All : TypeNameHandling.None,
-                ContractResolver = new MyContractResolver()
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
             };
             _path = Path.Combine(path, "Config");
             if (!Directory.Exists(_path))
@@ -35,22 +30,19 @@ namespace DataPairs
         }
         public PairsFile(string path)
         {
-            _jsonSerializerSettings = new JsonSerializerSettings
+            _jsonSerializerSettings = new()
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                TypeNameHandling = TypeNameHandling.All,
-                ContractResolver = new MyContractResolver()
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
             };
             _path = Path.Combine(path, "Config");
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
         }
 
-        public PairsFile(string path, JsonSerializerSettings jsonSerializerSettings, Formatting formatting)
+        public PairsFile(string path, JsonSerializerOptions jsonSerializerSettings)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
-            _formatting = formatting;
             _path = Path.Combine(path, "Config");
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
@@ -106,7 +98,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
                 return default;
-            return JsonConvert.DeserializeObject<T>(ReadFile(fileName), _jsonSerializerSettings);
+            return JsonSerializer.Deserialize<T>(ReadFile(fileName), _jsonSerializerSettings);
         }
 
         public async Task TryRemoveAsync(string key)
@@ -128,6 +120,6 @@ namespace DataPairs
         }
 
         private string ReadFile(string fileName) => File.ReadAllText(fileName, Encoding.UTF8);
-        private string SerializeObject<T>(T value) => JsonConvert.SerializeObject(value, Formatting.Indented, _jsonSerializerSettings);
+        private string SerializeObject<T>(T value) => JsonSerializer.Serialize(value, _jsonSerializerSettings);
     }
 }

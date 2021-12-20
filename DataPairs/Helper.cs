@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("KeyValuePairsUnitTestProject")]
 
@@ -7,15 +6,6 @@ namespace DataPairs
 {
     public static class Helper
     {
-        public static T Clone<T>(T t)
-        {
-            var settings = new JsonSerializerSettings()
-            {
-                TypeNameHandling = TypeNameHandling.All
-            };
-            var text = JsonConvert.SerializeObject(t, settings);
-            return JsonConvert.DeserializeObject<T>(text, settings);
-        }
         internal static async Task<T> HandleConcurrency<T>(Func<Task<T>> db)
         {
             int count = 0;

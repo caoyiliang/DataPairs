@@ -1,14 +1,15 @@
 ﻿using DataPairs.Entities;
 using DataPairs.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DataPairs
 {
     internal class Pairs : IPairs
     {
         private readonly string _connectionString;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
+        private readonly JsonSerializerOptions _jsonSerializerSettings;
         public Pairs() : this("data source")
         {
         }
@@ -17,12 +18,10 @@ namespace DataPairs
         }
         public Pairs(string path, string partialConnectionString)
         {
-            _jsonSerializerSettings = new JsonSerializerSettings
+            _jsonSerializerSettings = new()
             {
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                TypeNameHandling = TypeNameHandling.All,
-                ContractResolver = new MyContractResolver(),
+                ReferenceHandler = ReferenceHandler.Preserve,
+                WriteIndented = true
             };
             _connectionString = $"{partialConnectionString}={path}";
             using (var context = new PairsContext(_connectionString))
@@ -42,7 +41,7 @@ namespace DataPairs
                     await context.AddAsync(new PairsEntity()
                     {
                         Key = key,
-                        Value = JsonConvert.SerializeObject(value, _jsonSerializerSettings),
+                        Value = JsonSerializer.Serialize(value, _jsonSerializerSettings),
                     });
                     await context.SaveChangesAsync();
                     return true;
@@ -62,7 +61,7 @@ namespace DataPairs
                      var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
                      if (pair is null)
                          return false;
-                     var newValue = JsonConvert.SerializeObject(value, _jsonSerializerSettings);
+                     var newValue = JsonSerializer.Serialize(value, _jsonSerializerSettings);
                      if (!pair.Value.Equals(newValue))
                      {
                          pair.Value = newValue;
@@ -87,13 +86,13 @@ namespace DataPairs
                          await context.AddAsync(new PairsEntity()
                          {
                              Key = key,
-                             Value = JsonConvert.SerializeObject(value, _jsonSerializerSettings),
+                             Value = JsonSerializer.Serialize(value, _jsonSerializerSettings),
                          });
                          await context.SaveChangesAsync();
                      }
                      else
                      {
-                         var newValue = JsonConvert.SerializeObject(value, _jsonSerializerSettings);
+                         var newValue = JsonSerializer.Serialize(value, _jsonSerializerSettings);
                          if (!pair.Value.Equals(newValue))
                          {
                              pair.Value = newValue;
@@ -112,7 +111,7 @@ namespace DataPairs
             {
                 var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
                 if (pair is null) return default;
-                return JsonConvert.DeserializeObject<T>(pair.Value, _jsonSerializerSettings);
+                return JsonSerializer.Deserialize<T>(pair.Value, _jsonSerializerSettings);
             }
         }
 

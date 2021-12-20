@@ -1,6 +1,6 @@
 ﻿using DataPairs.Interfaces;
 using FastDeepCloner;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace DataPairs
 {
@@ -69,15 +69,10 @@ namespace DataPairs
             _key = key;
             _pairs = new PairsFile(path, includeTypeName);
         }
-        public DataPair(string key, JsonSerializerSettings jsonSerializerSettings)
+        public DataPair(string key, JsonSerializerOptions jsonSerializerSettings)
         {
             _key = key;
             _pairs = new PairsFile(jsonSerializerSettings);
-        }
-        public DataPair(string key, JsonSerializerSettings jsonSerializerSettings, Formatting formatting)
-        {
-            _key = key;
-            _pairs = new PairsFile(jsonSerializerSettings, formatting);
         }
 
         public async Task<bool> TryInitAsync(T value)
