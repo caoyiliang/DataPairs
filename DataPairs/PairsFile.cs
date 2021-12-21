@@ -54,7 +54,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
             {
-                await WriteFileAsync(fileName, SerializeObject(value));
+                await WriteFileAsync(fileName, await SerializeObject(value));
                 return true;
             }
             return false;
@@ -67,7 +67,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
                 return false;
-            var newValue = SerializeObject(value);
+            var newValue = await SerializeObject(value);
             var text = File.ReadAllText(fileName, Encoding.UTF8);
             if (!text.Equals(newValue))
             {
@@ -82,13 +82,13 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
             {
-                await WriteFileAsync(fileName, SerializeObject(value));
+                await WriteFileAsync(fileName, await SerializeObject(value));
                 return;
             }
             var newValue = SerializeObject(value);
             if (!newValue.Equals(ReadFile(fileName)))
             {
-                await WriteFileAsync(fileName, SerializeObject(value));
+                await WriteFileAsync(fileName, await SerializeObject(value));
             }
         }
 
@@ -98,7 +98,8 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
                 return default;
-            return JsonSerializer.Deserialize<T>(ReadFile(fileName), _jsonSerializerSettings);
+            using FileStream fs = File.OpenRead(fileName);
+            return await JsonSerializer.DeserializeAsync<T>(fs, _jsonSerializerSettings);
         }
 
         public async Task TryRemoveAsync(string key)
@@ -120,6 +121,13 @@ namespace DataPairs
         }
 
         private string ReadFile(string fileName) => File.ReadAllText(fileName, Encoding.UTF8);
-        private string SerializeObject<T>(T value) => JsonSerializer.Serialize(value, _jsonSerializerSettings);
+        private async Task<string> SerializeObject<T>(T value)
+        {
+            MemoryStream ms = new MemoryStream();
+            await JsonSerializer.SerializeAsync(ms, value, _jsonSerializerSettings);
+            ms.Position = 0;
+            using var reader = new StreamReader(ms);
+            return await reader.ReadToEndAsync();
+        }
     }
 }

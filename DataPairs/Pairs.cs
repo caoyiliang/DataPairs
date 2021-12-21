@@ -38,10 +38,14 @@ namespace DataPairs
                 var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
                 if (pair is null)
                 {
+                    MemoryStream ms = new MemoryStream();
+                    await JsonSerializer.SerializeAsync(ms, value, _jsonSerializerSettings);
+                    ms.Position = 0;
+                    using var reader = new StreamReader(ms);
                     await context.AddAsync(new PairsEntity()
                     {
                         Key = key,
-                        Value = JsonSerializer.Serialize(value, _jsonSerializerSettings),
+                        Value = await reader.ReadToEndAsync(),
                     });
                     await context.SaveChangesAsync();
                     return true;
@@ -61,7 +65,11 @@ namespace DataPairs
                      var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
                      if (pair is null)
                          return false;
-                     var newValue = JsonSerializer.Serialize(value, _jsonSerializerSettings);
+                     MemoryStream ms = new MemoryStream();
+                     await JsonSerializer.SerializeAsync(ms, value, _jsonSerializerSettings);
+                     ms.Position = 0;
+                     using var reader = new StreamReader(ms);
+                     var newValue = await reader.ReadToEndAsync();
                      if (!pair.Value.Equals(newValue))
                      {
                          pair.Value = newValue;
@@ -81,18 +89,22 @@ namespace DataPairs
                  using (var context = new PairsContext(_connectionString))
                  {
                      var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
+                     MemoryStream ms = new MemoryStream();
+                     await JsonSerializer.SerializeAsync(ms, value, _jsonSerializerSettings);
+                     ms.Position = 0;
+                     using var reader = new StreamReader(ms);
+                     var newValue = await reader.ReadToEndAsync();
                      if (pair is null)
                      {
                          await context.AddAsync(new PairsEntity()
                          {
                              Key = key,
-                             Value = JsonSerializer.Serialize(value, _jsonSerializerSettings),
+                             Value = newValue,
                          });
                          await context.SaveChangesAsync();
                      }
                      else
                      {
-                         var newValue = JsonSerializer.Serialize(value, _jsonSerializerSettings);
                          if (!pair.Value.Equals(newValue))
                          {
                              pair.Value = newValue;
@@ -111,7 +123,10 @@ namespace DataPairs
             {
                 var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
                 if (pair is null) return default;
-                return JsonSerializer.Deserialize<T>(pair.Value, _jsonSerializerSettings);
+                MemoryStream ms = new MemoryStream();
+                using var writer = new StreamWriter(ms);
+                await writer.WriteAsync(pair.Value);
+                return await JsonSerializer.DeserializeAsync<T>(ms, _jsonSerializerSettings);
             }
         }
 
