@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>6.0.4-alpha</Version>
+		<Version>6.0.5-alpha</Version>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
 		<PackageProjectUrl>https://github.com/caoyiliang/DataPairs</PackageProjectUrl>

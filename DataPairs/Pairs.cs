@@ -20,6 +20,7 @@ namespace DataPairs
         {
             _jsonSerializerSettings = new()
             {
+                PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
@@ -126,6 +127,8 @@ namespace DataPairs
                 MemoryStream ms = new MemoryStream();
                 using var writer = new StreamWriter(ms);
                 await writer.WriteAsync(pair.Value);
+                await writer.FlushAsync();
+                ms.Position = 0;
                 return await JsonSerializer.DeserializeAsync<T>(ms, _jsonSerializerSettings);
             }
         }

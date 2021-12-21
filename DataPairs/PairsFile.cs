@@ -21,6 +21,7 @@ namespace DataPairs
         {
             _jsonSerializerSettings = new()
             {
+                PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
@@ -32,6 +33,7 @@ namespace DataPairs
         {
             _jsonSerializerSettings = new()
             {
+                PropertyNameCaseInsensitive = true,
                 ReferenceHandler = ReferenceHandler.Preserve,
                 WriteIndented = true
             };
