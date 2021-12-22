@@ -1,5 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace DataPairs.Entities
 {
@@ -21,22 +20,6 @@ namespace DataPairs.Entities
             //    Password = "cd+8KpaWULi/W/jJNT3flg=="
             //}.ToString());
             optionsBuilder.UseSqlite(_connectionString);
-        }
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            UpdateVersion();
-            return base.SaveChangesAsync(cancellationToken);
-        }
-        private void UpdateVersion()
-        {
-            foreach (var entity in this.ChangeTracker.Entries())
-            {
-                if (entity.State == EntityState.Modified)
-                {
-                    if (entity.Entity is IVersion v)
-                        v.VersionNum++;
-                }
-            }
         }
     }
 }

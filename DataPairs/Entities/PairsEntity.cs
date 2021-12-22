@@ -2,12 +2,14 @@
 
 namespace DataPairs.Entities
 {
-    internal class PairsEntity : IVersion
+    internal class PairsEntity
     {
         [Key]
         public string Key { get; set; }
+
+        [ConcurrencyCheck]
         public byte[] Value { get; set; }
-        public long VersionNum { get; set; }
+
         public override bool Equals(object other)
         {
             if (other is null) return false;
@@ -15,6 +17,7 @@ namespace DataPairs.Entities
             if (pe is null) return false;
             return this.Key == pe.Key && this.Value == pe.Value;
         }
+
         public override int GetHashCode()
         {
             return Key.GetHashCode();
