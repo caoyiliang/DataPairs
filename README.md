@@ -1,5 +1,7 @@
 # DataPairs
 使用SQLite和文件存储数据键值的类库
+### master为Newtonsoft.Json版本，一个是System.Text.Json分支，一个是Ceras分支
+
 ## 使用方法非常简单,比如原先有如下数据模型需要存储：
 ```
     public class Data
