@@ -1,54 +1,27 @@
-﻿using DataPairs.Interfaces;
+﻿using Ceras;
+using DataPairs.Interfaces;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace DataPairs
 {
     internal class PairsFile : IPairs
     {
         private readonly string _path;
-        private readonly JsonSerializerOptions _jsonSerializerSettings;
-        public PairsFile(bool includeTypeName = true) : this(AppDomain.CurrentDomain.BaseDirectory, includeTypeName)
-        {
-        }
-        public PairsFile(JsonSerializerOptions jsonSerializerSettings) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings)
+        CerasSerializer _ceras;
+
+        public PairsFile() : this(AppDomain.CurrentDomain.BaseDirectory)
         {
 
         }
 
-        public PairsFile(string path, bool includeTypeName = true)
-        {
-            _jsonSerializerSettings = new()
-            {
-                PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
-            _path = Path.Combine(path, "Config");
-            if (!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
-        }
         public PairsFile(string path)
         {
-            _jsonSerializerSettings = new()
-            {
-                PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
             _path = Path.Combine(path, "Config");
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
+            _ceras = new();
         }
 
-        public PairsFile(string path, JsonSerializerOptions jsonSerializerSettings)
-        {
-            _jsonSerializerSettings = jsonSerializerSettings;
-            _path = Path.Combine(path, "Config");
-            if (!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
-        }
         public async Task<bool> TryAddAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
@@ -56,7 +29,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
             {
-                await WriteFileAsync(fileName, await SerializeObject(value));
+                await WriteFileAsync(fileName, SerializeObject(value));
                 return true;
             }
             return false;
@@ -69,7 +42,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
                 return false;
-            var newValue = await SerializeObject(value);
+            var newValue = SerializeObject(value);
             var text = File.ReadAllText(fileName, Encoding.UTF8);
             if (!text.Equals(newValue))
             {
@@ -84,13 +57,13 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
             {
-                await WriteFileAsync(fileName, await SerializeObject(value));
+                await WriteFileAsync(fileName, SerializeObject(value));
                 return;
             }
             var newValue = SerializeObject(value);
             if (!newValue.Equals(ReadFile(fileName)))
             {
-                await WriteFileAsync(fileName, await SerializeObject(value));
+                await WriteFileAsync(fileName, SerializeObject(value));
             }
         }
 
@@ -100,8 +73,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
                 return default;
-            using FileStream fs = File.OpenRead(fileName);
-            return await JsonSerializer.DeserializeAsync<T>(fs, _jsonSerializerSettings);
+            return _ceras.Deserialize<T>(ReadFile(fileName));
         }
 
         public async Task TryRemoveAsync(string key)
@@ -112,24 +84,16 @@ namespace DataPairs
                 File.Delete(fileName);
         }
 
-        private async Task WriteFileAsync(string fileName, string text)
+        private async Task WriteFileAsync(string fileName, byte[] text)
         {
-            byte[] rs = Encoding.UTF8.GetBytes(text);
             using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough))
             {
-                await fs.WriteAsync(rs, 0, rs.Length);
+                await fs.WriteAsync(text, 0, text.Length);
                 await fs.FlushAsync();
             }
         }
 
-        private string ReadFile(string fileName) => File.ReadAllText(fileName, Encoding.UTF8);
-        private async Task<string> SerializeObject<T>(T value)
-        {
-            MemoryStream ms = new MemoryStream();
-            await JsonSerializer.SerializeAsync(ms, value, _jsonSerializerSettings);
-            ms.Position = 0;
-            using var reader = new StreamReader(ms);
-            return await reader.ReadToEndAsync();
-        }
+        private byte[] ReadFile(string fileName) => File.ReadAllBytes(fileName);
+        private byte[] SerializeObject<T>(T value) => _ceras.Serialize(value);
     }
 }

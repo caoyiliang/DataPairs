@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>6.0.5-alpha</Version>
+		<Version>6.0.8-alpha</Version>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
 		<PackageProjectUrl>https://github.com/caoyiliang/DataPairs</PackageProjectUrl>
@@ -23,9 +23,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Ceras" Version="4.1.7" />
 		<PackageReference Include="FastDeepCloner" Version="1.3.6" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.1" />
-		<PackageReference Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.0.7" />
 	</ItemGroup>
 
 </Project>

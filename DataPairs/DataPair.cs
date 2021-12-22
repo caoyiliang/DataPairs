@@ -59,21 +59,6 @@ namespace DataPairs
                     throw new ArgumentException();
             }
         }
-        public DataPair(string key, bool includeTypeName)
-        {
-            _key = key;
-            _pairs = new PairsFile(includeTypeName);
-        }
-        public DataPair(string key, string path, bool includeTypeName)
-        {
-            _key = key;
-            _pairs = new PairsFile(path, includeTypeName);
-        }
-        public DataPair(string key, JsonSerializerOptions jsonSerializerSettings)
-        {
-            _key = key;
-            _pairs = new PairsFile(jsonSerializerSettings);
-        }
 
         public async Task<bool> TryInitAsync(T value)
         {

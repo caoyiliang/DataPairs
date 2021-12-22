@@ -6,7 +6,7 @@ namespace DataPairs.Entities
     {
         [Key]
         public string Key { get; set; }
-        public string Value { get; set; }
+        public byte[] Value { get; set; }
         public long VersionNum { get; set; }
         public override bool Equals(object other)
         {
