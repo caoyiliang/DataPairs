@@ -14,11 +14,6 @@ namespace DataPairs.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            //optionsBuilder.UseSqlite(new SqliteConnectionStringBuilder(_connectionString)
-            //{
-            //    Mode = SqliteOpenMode.ReadWriteCreate,
-            //    Password = "cd+8KpaWULi/W/jJNT3flg=="
-            //}.ToString());
             optionsBuilder.UseSqlite(_connectionString);
         }
     }
