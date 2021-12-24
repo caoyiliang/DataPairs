@@ -1,7 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using System.Runtime.CompilerServices;
-[assembly: InternalsVisibleTo("KeyValuePairsUnitTestProject")]
 
 namespace DataPairs
 {
