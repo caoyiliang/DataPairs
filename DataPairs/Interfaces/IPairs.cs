@@ -37,7 +37,7 @@ namespace DataPairs.Interfaces
         /// <param name="key"></param>
         /// <exception cref="ArgumentNullException"></exception>
         /// <returns></returns>
-        Task<T> TryGetValueAsync<T>(string key) where T : class;
+        Task<T?> TryGetValueAsync<T>(string key) where T : class;
         /// <summary>
         /// 
         /// </summary>

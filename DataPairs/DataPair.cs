@@ -8,7 +8,7 @@ namespace DataPairs
     {
         private IPairs _pairs;
         private string _key;
-        private T _value;
+        private T? _value;
         private SemaphoreSlim _valueSync = new SemaphoreSlim(1, 1);
         private string _partialConnectionString = "data source";
         private string _partialConnectionStringXamarin = "Filename";
@@ -86,7 +86,7 @@ namespace DataPairs
             try
             {
                 await _valueSync.WaitAsync();
-                if (!(_value is null)) return false;
+                if (_value is not null) return false;
                 if (await _pairs.TryAddAsync(_key, value))
                 {
                     _value = value.Clone();

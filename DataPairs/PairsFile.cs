@@ -100,12 +100,15 @@ namespace DataPairs
             }
         }
 
-        public async Task<T> TryGetValueAsync<T>(string key) where T : class
+        public async Task<T?> TryGetValueAsync<T>(string key) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
+            {
+                await Task.CompletedTask;
                 return default;
+            }
             return JsonConvert.DeserializeObject<T>(ReadFile(fileName), _jsonSerializerSettings);
         }
 
@@ -115,6 +118,7 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (File.Exists(fileName))
                 File.Delete(fileName);
+            await Task.CompletedTask;
         }
 
         private async Task WriteFileAsync(string fileName, string text)
