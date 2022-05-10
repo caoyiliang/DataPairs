@@ -4,7 +4,7 @@
 		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>6.0.3</Version>
+		<Version>6.0.4</Version>
 		<LangVersion>latest</LangVersion>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
@@ -24,12 +24,12 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.4" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="System.Text.Json" Version="6.0.2" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.23" />
+		<PackageReference Include="System.Text.Json" Version="6.0.3" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.24" />
 	</ItemGroup>
 
 	<ItemGroup>

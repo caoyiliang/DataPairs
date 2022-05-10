@@ -9,7 +9,7 @@ namespace DataPairs
     {
         private readonly string _path;
         private readonly JsonSerializerOptions _jsonSerializerSettings;
-        public PairsFile(bool includeTypeName = true) : this(AppDomain.CurrentDomain.BaseDirectory, includeTypeName)
+        public PairsFile() : this(AppDomain.CurrentDomain.BaseDirectory)
         {
         }
         public PairsFile(JsonSerializerOptions jsonSerializerSettings) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings)
@@ -17,18 +17,6 @@ namespace DataPairs
 
         }
 
-        public PairsFile(string path, bool includeTypeName = true)
-        {
-            _jsonSerializerSettings = new()
-            {
-                PropertyNameCaseInsensitive = true,
-                ReferenceHandler = ReferenceHandler.Preserve,
-                WriteIndented = true
-            };
-            _path = Path.Combine(path, "Config");
-            if (!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
-        }
         public PairsFile(string path)
         {
             _jsonSerializerSettings = new()
@@ -94,7 +82,7 @@ namespace DataPairs
             }
         }
 
-        public async Task<T> TryGetValueAsync<T>(string key) where T : class
+        public async Task<T?> TryGetValueAsync<T>(string key) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
             var fileName = Path.Combine(_path, key + ".json");
@@ -110,22 +98,21 @@ namespace DataPairs
             var fileName = Path.Combine(_path, key + ".json");
             if (File.Exists(fileName))
                 File.Delete(fileName);
+            await Task.CompletedTask;
         }
 
         private async Task WriteFileAsync(string fileName, string text)
         {
             byte[] rs = Encoding.UTF8.GetBytes(text);
-            using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough))
-            {
-                await fs.WriteAsync(rs, 0, rs.Length);
-                await fs.FlushAsync();
-            }
+            using var fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough);
+            await fs.WriteAsync(rs, 0, rs.Length);
+            await fs.FlushAsync();
         }
 
         private string ReadFile(string fileName) => File.ReadAllText(fileName, Encoding.UTF8);
         private async Task<string> SerializeObject<T>(T value)
         {
-            MemoryStream ms = new MemoryStream();
+            using MemoryStream ms = new();
             await JsonSerializer.SerializeAsync(ms, value, _jsonSerializerSettings);
             ms.Position = 0;
             using var reader = new StreamReader(ms);
