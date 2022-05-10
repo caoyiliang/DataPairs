@@ -5,12 +5,12 @@ namespace DataPairs.Entities
     internal class PairsEntity
     {
         [Key]
-        public string Key { get; set; }
+        public string Key { get; set; } = null!;
 
         [ConcurrencyCheck]
-        public byte[] Value { get; set; }
+        public byte[] Value { get; set; } = null!;
 
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is null) return false;
             var pe = other as PairsEntity;

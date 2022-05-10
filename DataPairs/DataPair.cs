@@ -7,7 +7,7 @@ namespace DataPairs
     {
         private IPairs _pairs;
         private string _key;
-        private T _value;
+        private T? _value;
         private SemaphoreSlim _valueSync = new SemaphoreSlim(1, 1);
         private string _partialConnectionString = "data source";
         private string _partialConnectionStringXamarin = "Filename";
