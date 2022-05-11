@@ -5,12 +5,12 @@ namespace DataPairs
 {
     public class DataPair<T> : IDataPair<T> where T : class, new()
     {
-        private IPairs _pairs;
-        private string _key;
+        private readonly IPairs _pairs;
+        private readonly string _key;
         private T? _value;
-        private SemaphoreSlim _valueSync = new SemaphoreSlim(1, 1);
-        private string _partialConnectionString = "data source";
-        private string _partialConnectionStringXamarin = "Filename";
+        private readonly SemaphoreSlim _valueSync = new(1, 1);
+        private readonly string _partialConnectionString = "data source";
+        private readonly string _partialConnectionStringXamarin = "Filename";
         public DataPair(string key)
         {
             _key = key;
@@ -24,39 +24,25 @@ namespace DataPairs
         public DataPair(string key, StorageType storageType)
         {
             _key = key;
-            switch (storageType)
+            _pairs = storageType switch
             {
-                case StorageType.File:
-                    _pairs = new PairsFile();
-                    break;
-                case StorageType.SQLite:
-                    _pairs = new Pairs(_partialConnectionString);
-                    break;
-                case StorageType.Xamarin:
-                    _pairs = new Pairs(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PairsDB.dll"),
-                        _partialConnectionStringXamarin);
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
+                StorageType.File => new PairsFile(),
+                StorageType.SQLite => new Pairs(_partialConnectionString),
+                StorageType.Xamarin => new Pairs(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PairsDB.dll"),
+                                        _partialConnectionStringXamarin),
+                _ => throw new ArgumentException(),
+            };
         }
         public DataPair(string key, string path, StorageType storageType)
         {
             _key = key;
-            switch (storageType)
+            _pairs = storageType switch
             {
-                case StorageType.File:
-                    _pairs = new PairsFile(path);
-                    break;
-                case StorageType.SQLite:
-                    _pairs = new Pairs(path, _partialConnectionString);
-                    break;
-                case StorageType.Xamarin:
-                    _pairs = new Pairs(path, _partialConnectionStringXamarin);
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
+                StorageType.File => new PairsFile(path),
+                StorageType.SQLite => new Pairs(path, _partialConnectionString),
+                StorageType.Xamarin => new Pairs(path, _partialConnectionStringXamarin),
+                _ => throw new ArgumentException(),
+            };
         }
 
         public async Task<bool> TryInitAsync(T value)
@@ -65,7 +51,7 @@ namespace DataPairs
             try
             {
                 await _valueSync.WaitAsync();
-                if (!(_value is null)) return false;
+                if (_value is not null) return false;
                 if (await _pairs.TryAddAsync(_key, value))
                 {
                     _value = value.Clone();

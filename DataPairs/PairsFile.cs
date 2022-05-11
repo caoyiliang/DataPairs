@@ -91,11 +91,9 @@ namespace DataPairs
 
         private async Task WriteFileAsync(string fileName, byte[] text)
         {
-            using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough))
-            {
-                await fs.WriteAsync(text, 0, text.Length);
-                await fs.FlushAsync();
-            }
+            using FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough);
+            await fs.WriteAsync(text, 0, text.Length);
+            await fs.FlushAsync();
         }
 
         private byte[] ReadFile(string fileName) => File.ReadAllBytes(fileName);
