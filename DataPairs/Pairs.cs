@@ -28,6 +28,14 @@ namespace DataPairs
             using var context = new PairsContext(_connectionString);
             context.Database.EnsureCreated();
         }
+        public Pairs(string path, string partialConnectionString, JsonSerializerSettings jsonSerializerSettings)
+        {
+            _jsonSerializerSettings = jsonSerializerSettings;
+            _connectionString = $"{partialConnectionString}={path}";
+            using var context = new PairsContext(_connectionString);
+            context.Database.EnsureCreated();
+        }
+
         public async Task<bool> TryAddAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");

@@ -8,30 +8,12 @@ namespace DataPairs
     {
         private readonly string _path;
         private readonly JsonSerializerSettings _jsonSerializerSettings;
-        private Formatting _formatting = Formatting.Indented;
-        public PairsFile(bool includeTypeName = true) : this(AppDomain.CurrentDomain.BaseDirectory, includeTypeName)
+        public PairsFile() : this(AppDomain.CurrentDomain.BaseDirectory)
         {
         }
-        public PairsFile(JsonSerializerSettings jsonSerializerSettings) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings, Formatting.Indented)
+        public PairsFile(JsonSerializerSettings jsonSerializerSettings) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings)
         {
 
-        }
-        public PairsFile(JsonSerializerSettings jsonSerializerSettings, Formatting formatting) : this(AppDomain.CurrentDomain.BaseDirectory, jsonSerializerSettings, formatting)
-        {
-
-        }
-        public PairsFile(string path, bool includeTypeName = true)
-        {
-            _jsonSerializerSettings = new JsonSerializerSettings
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                TypeNameHandling = includeTypeName ? TypeNameHandling.All : TypeNameHandling.None,
-                ContractResolver = new MyContractResolver()
-            };
-            _path = Path.Combine(path, "Config");
-            if (!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
         }
         public PairsFile(string path)
         {
@@ -46,15 +28,14 @@ namespace DataPairs
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
         }
-
-        public PairsFile(string path, JsonSerializerSettings jsonSerializerSettings, Formatting formatting)
+        public PairsFile(string path, JsonSerializerSettings jsonSerializerSettings)
         {
             _jsonSerializerSettings = jsonSerializerSettings;
-            _formatting = formatting;
             _path = Path.Combine(path, "Config");
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
         }
+
         public async Task<bool> TryAddAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
@@ -124,11 +105,9 @@ namespace DataPairs
         private async Task WriteFileAsync(string fileName, string text)
         {
             byte[] rs = Encoding.UTF8.GetBytes(text);
-            using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough))
-            {
-                await fs.WriteAsync(rs, 0, rs.Length);
-                await fs.FlushAsync();
-            }
+            using var fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough);
+            await fs.WriteAsync(rs, 0, rs.Length);
+            await fs.FlushAsync();
         }
 
         private string ReadFile(string fileName) => File.ReadAllText(fileName, Encoding.UTF8);
