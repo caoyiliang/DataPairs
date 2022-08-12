@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
-		<Version>6.0.5</Version>
+		<Version>6.0.6</Version>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
 		<PackageProjectUrl>https://github.com/caoyiliang/DataPairs</PackageProjectUrl>
@@ -25,13 +25,13 @@
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
 		<PackageReference Include="FastDeepCloner" Version="1.3.6" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
 		<PackageReference Include="FastDeepCloner" Version="1.3.6" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.25" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.28" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	</ItemGroup>
 
