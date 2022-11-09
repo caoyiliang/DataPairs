@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net6.0</TargetFrameworks>
+		<TargetFrameworks>netstandard2.0;net6.0;net7.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>6.0.6</Version>
+		<Version>7.0.0</Version>
 		<LangVersion>latest</LangVersion>
 		<PackageReleaseNotes></PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
@@ -22,12 +22,12 @@
 	  </None>
 	</ItemGroup>
 
-	<ItemGroup Condition=" '$(TargetFramework)' == 'net6.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="6.0.8" />
+	<ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.28" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.31" />
 	</ItemGroup>
 
 	<ItemGroup>
