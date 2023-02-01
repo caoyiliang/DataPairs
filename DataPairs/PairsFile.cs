@@ -7,7 +7,13 @@ namespace DataPairs
     internal class PairsFile : IPairs
     {
         private readonly string _path;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+        {
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
+            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+            TypeNameHandling = TypeNameHandling.All,
+            ContractResolver = new MyContractResolver()
+        };
         public PairsFile() : this(AppDomain.CurrentDomain.BaseDirectory)
         {
         }
@@ -15,22 +21,10 @@ namespace DataPairs
         {
 
         }
-        public PairsFile(string path)
+        public PairsFile(string path, JsonSerializerSettings? jsonSerializerSettings = null)
         {
-            _jsonSerializerSettings = new JsonSerializerSettings
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                TypeNameHandling = TypeNameHandling.All,
-                ContractResolver = new MyContractResolver()
-            };
-            _path = Path.Combine(path, "Config");
-            if (!Directory.Exists(_path))
-                Directory.CreateDirectory(_path);
-        }
-        public PairsFile(string path, JsonSerializerSettings jsonSerializerSettings)
-        {
-            _jsonSerializerSettings = jsonSerializerSettings;
+            if (jsonSerializerSettings is not null)
+                _jsonSerializerSettings = jsonSerializerSettings;
             _path = Path.Combine(path, "Config");
             if (!Directory.Exists(_path))
                 Directory.CreateDirectory(_path);
@@ -64,6 +58,7 @@ namespace DataPairs
             }
             return true;
         }
+
         public async Task TryAddOrUpdateAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
@@ -81,14 +76,14 @@ namespace DataPairs
             }
         }
 
-        public async Task<T?> TryGetValueAsync<T>(string key) where T : class
+        public async Task<T?> TryGetValueAsync<T>(string key, T? defaultValue = default) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
             {
                 await Task.CompletedTask;
-                return default;
+                return defaultValue;
             }
             return JsonConvert.DeserializeObject<T>(ReadFile(fileName), _jsonSerializerSettings);
         }

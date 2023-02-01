@@ -10,17 +10,25 @@ namespace DataPairs
         private readonly string _key;
         private T? _value;
         private readonly SemaphoreSlim _valueSync = new(1, 1);
-        private readonly string _partialConnectionString = "data source";
-        private readonly string _partialConnectionStringXamarin = "Filename";
         public DataPair(string key)
         {
             _key = key;
-            _pairs = new Pairs(_partialConnectionString);
+            _pairs = new Pairs();
+        }
+        public DataPair(string key, JsonSerializerSettings jsonSerializerSettings)
+        {
+            _key = key;
+            _pairs = new Pairs(jsonSerializerSettings: jsonSerializerSettings);
         }
         public DataPair(string key, string path)
         {
             _key = key;
-            _pairs = new Pairs(path, _partialConnectionString);
+            _pairs = new Pairs(path);
+        }
+        public DataPair(string key, string path, JsonSerializerSettings jsonSerializerSettings)
+        {
+            _key = key;
+            _pairs = new Pairs(path, jsonSerializerSettings);
         }
         public DataPair(string key, StorageType storageType)
         {
@@ -28,9 +36,19 @@ namespace DataPairs
             _pairs = storageType switch
             {
                 StorageType.File => new PairsFile(),
-                StorageType.SQLite => new Pairs(_partialConnectionString),
-                StorageType.Xamarin => new Pairs(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PairsDB.dll"),
-_partialConnectionStringXamarin),
+                StorageType.SQLite => new Pairs(),
+                StorageType.Xamarin => new Pairs(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PairsDB.dll"), partialConnectionString: "Filename"),
+                _ => throw new ArgumentException(),
+            };
+        }
+        public DataPair(string key, StorageType storageType, JsonSerializerSettings jsonSerializerSettings)
+        {
+            _key = key;
+            _pairs = storageType switch
+            {
+                StorageType.File => new PairsFile(jsonSerializerSettings: jsonSerializerSettings),
+                StorageType.SQLite => new Pairs(jsonSerializerSettings: jsonSerializerSettings),
+                StorageType.Xamarin => new Pairs(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "PairsDB.dll"), jsonSerializerSettings, "Filename"),
                 _ => throw new ArgumentException(),
             };
         }
@@ -40,8 +58,8 @@ _partialConnectionStringXamarin),
             _pairs = storageType switch
             {
                 StorageType.File => new PairsFile(path),
-                StorageType.SQLite => new Pairs(path, _partialConnectionString),
-                StorageType.Xamarin => new Pairs(path, _partialConnectionStringXamarin),
+                StorageType.SQLite => new Pairs(path),
+                StorageType.Xamarin => new Pairs(path, partialConnectionString: "Filename"),
                 _ => throw new ArgumentException(),
             };
         }
@@ -51,30 +69,10 @@ _partialConnectionStringXamarin),
             _pairs = storageType switch
             {
                 StorageType.File => new PairsFile(jsonSerializerSettings),
-                StorageType.SQLite => new Pairs(path, _partialConnectionString, jsonSerializerSettings),
-                StorageType.Xamarin => new Pairs(path, _partialConnectionStringXamarin, jsonSerializerSettings),
+                StorageType.SQLite => new Pairs(path),
+                StorageType.Xamarin => new Pairs(path, jsonSerializerSettings, "Filename"),
                 _ => throw new ArgumentException(),
             };
-        }
-
-        public async Task<bool> TryInitAsync(T value)
-        {
-            if (value is null) throw new ArgumentNullException("value is null");
-            try
-            {
-                await _valueSync.WaitAsync();
-                if (_value is not null) return false;
-                if (await _pairs.TryAddAsync(_key, value))
-                {
-                    _value = value.Clone();
-                    return true;
-                }
-                return false;
-            }
-            finally
-            {
-                _valueSync.Release();
-            }
         }
 
         public async Task TryInitOrUpdateAsync(T value)
@@ -125,6 +123,29 @@ _partialConnectionStringXamarin),
             }
         }
 
+        #region Obsolete
+        [Obsolete]
+        public async Task<bool> TryInitAsync(T value)
+        {
+            if (value is null) throw new ArgumentNullException("value is null");
+            try
+            {
+                await _valueSync.WaitAsync();
+                if (_value is not null) return false;
+                if (await _pairs.TryAddAsync(_key, value))
+                {
+                    _value = value.Clone();
+                    return true;
+                }
+                return false;
+            }
+            finally
+            {
+                _valueSync.Release();
+            }
+        }
+
+        [Obsolete]
         public async Task<bool> TryUpdateAsync(T value)
         {
             if (value is null) throw new ArgumentNullException("value is null");
@@ -144,5 +165,6 @@ _partialConnectionStringXamarin),
                 _valueSync.Release();
             }
         }
+        #endregion
     }
 }

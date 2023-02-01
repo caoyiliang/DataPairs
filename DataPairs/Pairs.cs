@@ -8,29 +8,18 @@ namespace DataPairs
     internal class Pairs : IPairs
     {
         private readonly string _connectionString;
-        private readonly JsonSerializerSettings _jsonSerializerSettings;
-        public Pairs() : this("data source")
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
-        }
-        public Pairs(string partialConnectionString) : this("PairsDB.dll", partialConnectionString)
+            PreserveReferencesHandling = PreserveReferencesHandling.All,
+            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+            TypeNameHandling = TypeNameHandling.All,
+            ContractResolver = new MyContractResolver(),
+        };
+
+        public Pairs(string path = "PairsDB.dll", JsonSerializerSettings? jsonSerializerSettings = null, string partialConnectionString = "data source")
         {
-        }
-        public Pairs(string path, string partialConnectionString)
-        {
-            _jsonSerializerSettings = new JsonSerializerSettings
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.All,
-                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-                TypeNameHandling = TypeNameHandling.All,
-                ContractResolver = new MyContractResolver(),
-            };
-            _connectionString = $"{partialConnectionString}={path}";
-            using var context = new PairsContext(_connectionString);
-            context.Database.EnsureCreated();
-        }
-        public Pairs(string path, string partialConnectionString, JsonSerializerSettings jsonSerializerSettings)
-        {
-            _jsonSerializerSettings = jsonSerializerSettings;
+            if (jsonSerializerSettings is not null)
+                _jsonSerializerSettings = jsonSerializerSettings;
             _connectionString = $"{partialConnectionString}={path}";
             using var context = new PairsContext(_connectionString);
             context.Database.EnsureCreated();
@@ -75,6 +64,7 @@ namespace DataPairs
                 return true;
             });
         }
+
         public async Task TryAddOrUpdateAsync<T>(string key, T value) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
@@ -105,12 +95,12 @@ namespace DataPairs
             });
         }
 
-        public async Task<T?> TryGetValueAsync<T>(string key) where T : class
+        public async Task<T?> TryGetValueAsync<T>(string key, T? defaultValue = default) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
             await using var context = new PairsContext(_connectionString);
             var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
-            if (pair is null) return default;
+            if (pair is null) return defaultValue;
             return JsonConvert.DeserializeObject<T>(pair.Value, _jsonSerializerSettings);
         }
 
