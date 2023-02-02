@@ -68,14 +68,14 @@ namespace DataPairs
             }
         }
 
-        public async Task<T?> TryGetValueAsync<T>(string key) where T : class
+        public async Task<T?> TryGetValueAsync<T>(string key, T? defaultValue = default) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
             var fileName = Path.Combine(_path, key + ".json");
             if (!File.Exists(fileName))
             {
                 await Task.CompletedTask;
-                return default;
+                return defaultValue;
             }
             return _ceras.Deserialize<T>(ReadFile(fileName));
         }

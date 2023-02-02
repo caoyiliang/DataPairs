@@ -9,13 +9,8 @@ namespace DataPairs
     {
         private readonly string _connectionString;
         CerasSerializer _ceras;
-        public Pairs() : this("data source")
-        {
-        }
-        public Pairs(string partialConnectionString) : this("PairsDB.dll", partialConnectionString)
-        {
-        }
-        public Pairs(string path, string partialConnectionString)
+
+        public Pairs(string path = "PairsDB.dll", string partialConnectionString = "data source")
         {
             _connectionString = $"{partialConnectionString}={path}";
             using var context = new PairsContext(_connectionString);
@@ -92,12 +87,12 @@ namespace DataPairs
             });
         }
 
-        public async Task<T?> TryGetValueAsync<T>(string key) where T : class
+        public async Task<T?> TryGetValueAsync<T>(string key, T? defaultValue = default) where T : class
         {
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
             await using var context = new PairsContext(_connectionString);
             var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
-            if (pair is null) return default;
+            if (pair is null) return defaultValue;
             return _ceras.Deserialize<T>(pair.Value);
         }
 

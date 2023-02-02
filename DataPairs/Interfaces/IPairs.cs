@@ -4,46 +4,24 @@ namespace DataPairs.Interfaces
 {
     internal interface IPairs
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        #region Obsolete
         /// <exception cref="ArgumentNullException"></exception>
-        /// <returns> true if the key/value pair was added to the IPairs successfully; false if the key already exists.</returns>
+        [Obsolete]
         Task<bool> TryAddAsync<T>(string key, T value) where T : class;
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+
         /// <exception cref="ArgumentNullException"></exception>
-        /// <returns>true if the key/value pair was replaced with newValue; false if the key was not found</returns>
+        [Obsolete]
         Task<bool> TryUpdateAsync<T>(string key, T value) where T : class;
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        #endregion
+
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="DbUpdateConcurrencyException"></exception>
-        /// <returns></returns>
         Task TryAddOrUpdateAsync<T>(string key, T value) where T : class;
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
+
         /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
-        Task<T?> TryGetValueAsync<T>(string key) where T : class;
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="key"></param>
+        Task<T?> TryGetValueAsync<T>(string key, T? defaultValue = default) where T : class;
+
         /// <exception cref="ArgumentNullException"></exception>
-        /// <returns></returns>
         Task TryRemoveAsync(string key);
     }
 }
