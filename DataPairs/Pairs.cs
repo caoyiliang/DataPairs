@@ -1,6 +1,7 @@
 ﻿using DataPairs.Entities;
 using DataPairs.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -13,7 +14,12 @@ namespace DataPairs
         {
             PropertyNameCaseInsensitive = true,
             ReferenceHandler = ReferenceHandler.Preserve,
-            WriteIndented = true
+            WriteIndented = true,
+            Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+            Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
+            IgnoreReadOnlyProperties = false,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true
         };
         public Pairs(string path = "PairsDB.dll", JsonSerializerOptions? jsonSerializerSettings = null, string partialConnectionString = "data source")
         {
