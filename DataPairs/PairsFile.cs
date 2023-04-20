@@ -1,6 +1,7 @@
 ﻿using DataPairs.Interfaces;
 using Newtonsoft.Json;
 using System.Text;
+using System.Transactions;
 
 namespace DataPairs
 {
@@ -99,10 +100,12 @@ namespace DataPairs
 
         private async Task WriteFileAsync(string fileName, string text)
         {
+            using var scope = new TransactionScope();
             byte[] rs = Encoding.UTF8.GetBytes(text);
             using var fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough);
             await fs.WriteAsync(rs, 0, rs.Length);
             await fs.FlushAsync();
+            scope.Complete();
         }
 
         private string ReadFile(string fileName) => File.ReadAllText(fileName, Encoding.UTF8);
