@@ -1,6 +1,7 @@
 ﻿using Ceras;
 using DataPairs.Interfaces;
 using System.Text;
+using System.Transactions;
 
 namespace DataPairs
 {
@@ -91,9 +92,11 @@ namespace DataPairs
 
         private async Task WriteFileAsync(string fileName, byte[] text)
         {
+            using var scope = new TransactionScope();
             using FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite, FileShare.None, 8, FileOptions.WriteThrough);
             await fs.WriteAsync(text, 0, text.Length);
             await fs.FlushAsync();
+            scope.Complete();
         }
 
         private byte[] ReadFile(string fileName) => File.ReadAllBytes(fileName);
