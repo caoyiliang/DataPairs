@@ -14,7 +14,7 @@ namespace Test
         public decimal A { get; set; }
         public List<decimal> B { get; set; } = new List<decimal>();
 
-        private static readonly IDataPair<Data> _pair = new DataPair<Data>(typeof(Data).Name);
+        private static readonly IDataPair<Data> _pair = new DataPair<Data>(nameof(Data));
 
         public async Task InitAsync()
         {
