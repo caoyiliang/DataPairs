@@ -8,7 +8,7 @@ namespace DataPairs
     internal class Pairs : IPairs
     {
         private readonly string _connectionString;
-        private readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
+        private readonly JsonSerializerSettings _jsonSerializerSettings = new()
         {
             PreserveReferencesHandling = PreserveReferencesHandling.All,
             ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
@@ -27,8 +27,8 @@ namespace DataPairs
 
         public async Task<bool> TryAddAsync<T>(string key, T value) where T : class
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
-            if (value is null) throw new ArgumentNullException("must have a value");
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key), "must have a key");
+            if (value is null) throw new ArgumentNullException(nameof(value), "must have a value");
             await using var context = new PairsContext(_connectionString);
             var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
             if (pair is null)
@@ -46,8 +46,8 @@ namespace DataPairs
 
         public async Task<bool> TryUpdateAsync<T>(string key, T value) where T : class
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
-            if (value is null) throw new ArgumentNullException("must have a value");
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key), "must have a key");
+            if (value is null) throw new ArgumentNullException(nameof(value), "must have a value");
             return await Helper.HandleConcurrency(async () =>
             {
                 await using var context = new PairsContext(_connectionString);
@@ -67,8 +67,8 @@ namespace DataPairs
 
         public async Task TryAddOrUpdateAsync<T>(string key, T value) where T : class
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
-            if (value is null) throw new ArgumentNullException("must have a value");
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key), "must have a key");
+            if (value is null) throw new ArgumentNullException(nameof(value), "must have a value");
             await Helper.HandleConcurrency(async () =>
             {
                 await using var context = new PairsContext(_connectionString);
@@ -97,7 +97,7 @@ namespace DataPairs
 
         public async Task<T?> TryGetValueAsync<T>(string key, T? defaultValue = default) where T : class
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key), "must have a key");
             await using var context = new PairsContext(_connectionString);
             var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
             if (pair is null) return defaultValue;
@@ -106,7 +106,7 @@ namespace DataPairs
 
         public async Task TryRemoveAsync(string key)
         {
-            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException("must have a key");
+            if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key), "must have a key");
             await using var context = new PairsContext(_connectionString);
             var pair = await (from d in context.Pairs where d.Key == key select d).SingleOrDefaultAsync();
             if (pair is null) return;
