@@ -62,12 +62,8 @@ namespace DataPairs
             try
             {
                 await _valueSync.WaitAsync();
-                if (_value is null)
-                {
-                    _value = await _pairs.TryGetValueAsync<T>(_key);
-                }
-                if (_value is null) return new T();
-                return _value.Clone();
+                _value ??= await _pairs.TryGetValueAsync<T>(_key);
+                return _value is null ? new T() : _value.Clone();
             }
             finally
             {

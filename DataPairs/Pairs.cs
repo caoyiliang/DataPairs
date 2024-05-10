@@ -8,7 +8,7 @@ namespace DataPairs
     internal class Pairs : IPairs
     {
         private readonly string _connectionString;
-        CerasSerializer _ceras;
+        readonly CerasSerializer _ceras;
 
         public Pairs(string path = "PairsDB.dll", string partialConnectionString = "data source")
         {
