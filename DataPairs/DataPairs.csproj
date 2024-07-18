@@ -3,9 +3,9 @@
 		<TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>8.0.3</Version>
+		<Version>8.0.4</Version>
 		<LangVersion>latest</LangVersion>
-		<PackageReleaseNotes></PackageReleaseNotes>
+		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
 		<PackageProjectUrl>https://github.com/caoyiliang/DataPairs</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/caoyiliang/DataPairs</RepositoryUrl>
@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.4" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.7" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
