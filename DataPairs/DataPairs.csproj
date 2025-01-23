@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
-		<Version>9.0.0</Version>
-		<PackageReleaseNotes>更新.net9</PackageReleaseNotes>
+		<Version>9.0.1</Version>
+		<PackageReleaseNotes>更新依赖</PackageReleaseNotes>
 		<Description>使用SQLite和文件存储数据键值的类库</Description>
 		<PackageProjectUrl>https://github.com/caoyiliang/DataPairs</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/caoyiliang/DataPairs</RepositoryUrl>
@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' != 'netstandard2.0' ">
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
 	</ItemGroup>
 
 	<ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
