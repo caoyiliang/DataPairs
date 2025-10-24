@@ -12,8 +12,7 @@ namespace DataPairs
         {
             PreserveReferencesHandling = PreserveReferencesHandling.All,
             ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-            TypeNameHandling = TypeNameHandling.All,
-            ContractResolver = new MyContractResolver(),
+            TypeNameHandling = TypeNameHandling.All
         };
 
         public Pairs(string path = "PairsDB.dll", JsonSerializerSettings? jsonSerializerSettings = null, string partialConnectionString = "data source")
