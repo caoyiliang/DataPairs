@@ -49,7 +49,7 @@ namespace DataPairs
             {
                 await _valueSync.WaitAsync();
                 await _pairs.TryAddOrUpdateAsync(_key, value);
-                _value = value.Clone();
+                _value = value.Clone(FieldType.Both);
             }
             finally
             {
@@ -63,7 +63,7 @@ namespace DataPairs
             {
                 await _valueSync.WaitAsync();
                 _value ??= await _pairs.TryGetValueAsync<T>(_key);
-                return _value is null ? new T() : _value.Clone();
+                return _value is null ? new T() : _value.Clone(FieldType.Both);
             }
             finally
             {
@@ -97,7 +97,7 @@ namespace DataPairs
                 if (_value is null) return false;
                 if (await _pairs.TryUpdateAsync(_key, value))
                 {
-                    _value = value.Clone();
+                    _value = value.Clone(FieldType.Both);
                     return true;
                 }
                 return false;
@@ -118,7 +118,7 @@ namespace DataPairs
                 if (_value is not null) return false;
                 if (await _pairs.TryAddAsync(_key, value))
                 {
-                    _value = value.Clone();
+                    _value = value.Clone(FieldType.Both);
                     return true;
                 }
                 return false;
