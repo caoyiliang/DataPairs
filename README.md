@@ -2,6 +2,9 @@
 使用SQLite和文件存储数据键值的类库
 ### master为Newtonsoft.Json版本，一个是System.Text.Json分支，一个是Ceras分支
 
+### FastDeepClone:克隆字段和属性 忽略使用[FastDeepClonerIgnore]特性
+### Newtonsoft.Json：只克隆公开属性，如果需要克隆私有属性和字段请使用[JsonProperty]特性标记，忽略使用[JsonIgnore]特性
+
 ## 使用方法非常简单,比如原先有如下数据模型需要存储：
 ```
     public class Data
